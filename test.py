@@ -25,28 +25,8 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-import re2
 
-from desc_parser import PREVIEW_LEN, _markdownify, parse_problem_desc
-
-
-def parse_problem_desc_uncapped(content: str) -> str:
-    """
-    `parse_problem_desc` with the PREVIEW_LEN truncation removed.
-
-    A copy rather than a refactor: the point is to measure what the cap discards,
-    so this has to stay pinned to the current parsing steps even if the real one
-    changes.
-    """
-    if not content:
-        return "No description available."
-
-    content = re2.sub(
-        r"(?s)<table.*?>.*?</table>", "\n<em>[Table omitted for preview]<em>\n", content
-    )
-    md_text = _markdownify(content, heading_style="ATX", strip=["img"]).strip()
-    return re2.sub(r"\n\s*\n", "\n\n", md_text)
-
+from desc_parser import PREVIEW_LEN, parse_problem_desc, parse_problem_desc_uncapped
 
 DB_PATH = Path("~/programming/LeetCodeBot/db/testbot.db").expanduser()
 OUT_DIR = Path(__file__).resolve().parent

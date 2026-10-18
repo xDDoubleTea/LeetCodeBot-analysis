@@ -8,9 +8,17 @@ directory can be analysed without importing the bot, whose import chain reaches
 Being a copy, it drifts the moment the bot's parser changes. Re-copy
 `LeetCodeMarkdownConverter`, `_fix_truncated_markdown` and `parse_problem_desc`
 before trusting a fresh run.
+
+`parse_problem_desc_bs4` is the parser the bot used before PR #29, copied from
+`LeetCodeAPI._parse_problem_desc` in `core/leetcode_api.py` at commit 800f375^.
+Its cut-off was `preview_len = 800` (`config/constants.py` at the same commit).
+It is fixed history, kept here to time it against the current parser.
 """
 
+import re
+
 import re2
+from bs4 import BeautifulSoup
 from markdownify import MarkdownConverter
 
 PREVIEW_LEN = 4000
@@ -72,3 +80,42 @@ def parse_problem_desc(content: str) -> str:
     truncated = _fix_truncated_markdown(truncated)
 
     return truncated + ("\n..." if truncated.endswith("```") else "...")
+
+
+def parse_problem_desc_uncapped(content: str) -> str:
+    """
+    `parse_problem_desc` with the PREVIEW_LEN truncation removed.
+
+    A copy rather than a refactor: the point is to measure what the cap discards,
+    so this has to stay pinned to the current parsing steps even if the real one
+    changes.
+    """
+    if not content:
+        return "No description available."
+
+    content = re2.sub(
+        r"(?s)<table.*?>.*?</table>", "\n<em>[Table omitted for preview]<em>\n", content
+    )
+    md_text = _markdownify(content, heading_style="ATX", strip=["img"]).strip()
+    return re2.sub(r"\n\s*\n", "\n\n", md_text)
+
+
+def parse_problem_desc_bs4(content: str, preview_len: int = 800) -> str:
+    if not content:
+        return "No description available."
+    soup = BeautifulSoup(content, "html.parser")
+
+    for tag in soup.find_all("sup"):
+        tag.string = f"^{tag.get_text()}"
+    for tag in soup.find_all("code"):
+        tag.string = f"`{tag.get_text()}`"
+    for tag in soup.find_all("em"):
+        tag.string = f"*{tag.get_text()}*"
+    for tag in soup.find_all("strong"):
+        tag.string = f"**{tag.get_text()}**"
+
+    text_only = soup.get_text()
+    problem_md = re.sub(r"\n\s*\n", "\n\n", text_only.strip())[:preview_len]
+    if len(text_only.strip()) > preview_len:
+        problem_md += "..."
+    return problem_md
