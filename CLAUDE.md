@@ -54,7 +54,7 @@ The user may have the notebook open in JupyterLab. Edit it with `nbformat` in pl
 
 LeetCode returns `status: null` for another user's problems without that user's session cookie, so solved and attempting status are not available for them. Signed in, `status` is `"ac"`, `"notac"` or `null` for the user's own problems.
 
-**This repository is public and the notebook is committed with its outputs.** A signed-in history includes failed submissions, which only their owner can see on LeetCode. Cells that read `cache/submissions.json` print aggregates only, never individual submissions, and skip when the file is missing.
+**This repository is public and the notebook is committed with its outputs.** Showing individual submissions from the signed-in history is fine, failed ones included; the user decided that on 2026-10-18. Submitted code is never fetched, and the cookie values are never printed. Cells that read `cache/submissions.json` skip when the file is missing.
 
 ## Conventions
 
