@@ -31,6 +31,8 @@ Everything reads the bot's test database, `~/programming/LeetCodeBot/db/testbot.
 
 ## Rules
 
+**Never put real identifiers in anything public.** This repository and LeetCodeBot's are both public, as are their PRs, issues and commit messages. Don't put Discord user ids or LeetCode usernames from `logs/`, `cache/` or the database in commits, committed files or notebook outputs. Print users as U1, U2, ..., as `activity_stats.py` does, or use a placeholder such as `123456789012345678`. The signed-in user's own submission history is the one exception, decided on 2026-10-18 (see `problem_ranking.ipynb`).
+
 **Update `findings.md` whenever `problems.csv` changes**, in the same commit. Run `uv run findings_stats.py`, copy the numbers into every section, and regenerate the charts with `uv run test.py`. Copy the old CSV aside first if its numbers might still be needed.
 
 Section 4 of `findings.md` uses the CSV's `markdown_length`, the length after the 4,000-character cap, with population moments. Every other Markdown length is uncapped. `findings_stats.py` already does this; keep the two consistent.
