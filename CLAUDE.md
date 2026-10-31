@@ -12,6 +12,7 @@ uv run test.py                          # the three description-length charts
 uv run jupyter lab                      # open problem_ranking.ipynb
 uv run jupyter nbconvert --to notebook --execute --inplace problem_ranking.ipynb
 uv run leetcode_auth.py                 # signed-in submission history -> cache/submissions.json
+uv run perf_csv.py                      # latency lines in logs/prod -> cache/perf.csv
 ```
 
 `problems.csv` is written by `export_csv.py`, which imports the bot's own parser, so it runs from the bot checkout with the bot's venv:
