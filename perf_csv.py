@@ -8,13 +8,17 @@ same latency lines, so a line found in more than one file is kept once:
 
 Columns are `timestamp`, `command`, then every `key=value` field in the order
 it first appears, so a metric added to the bot shows up as a new column without
-changing this script. Fields a line does not have, and the `-` and `?`
+changing this script. That includes the arguments the user passed, as
+`arg_<name>`, and `linked_user_id` when `/user-info` or `/recent-submissions`
+fell back to the caller's linked account. Values are split with `shlex`, so a
+quoted argument such as `arg_title='two sum'` stays one cell. Fields a line does not have, and the `-` and `?`
 placeholders, are left empty, so a spreadsheet's MEDIAN and AVERAGE skip them.
 Timestamps are as the bot logged them.
 """
 
 import csv
 import re
+import shlex
 from pathlib import Path
 
 LOG_DIR = Path("logs/prod")
@@ -41,7 +45,7 @@ for line in sorted(lines):
     if not match:
         continue
     row = {"timestamp": match["timestamp"]}
-    for pair in match["fields"].split():
+    for pair in shlex.split(match["fields"]):
         key, _, value = pair.partition("=")
         row[key] = "" if value in EMPTY_VALUES else value
         if key not in columns:
